@@ -16,7 +16,7 @@ RUN wget https://downloads.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apa
     rm apache-tomcat-${TOMCAT_VERSION}.tar.gz
 
 # Copy the WAR file into Tomcat webapps directory
-COPY ../build/deploy/identityiq.war /opt/tomcat/webapps/
+COPY identityiq.war /opt/tomcat/webapps/
 
 # Set permissions for OpenShift compatibility
 RUN chmod -R g+rwX /opt/tomcat && \
