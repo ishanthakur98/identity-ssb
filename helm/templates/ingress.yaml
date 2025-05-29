@@ -18,3 +18,10 @@ spec:
                 name: {{ include "wellsfargo.fullname" . }}
                 port:
                   number: {{ .Values.service.port }}
+          - path: /identityiq
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "wellsfargo.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
