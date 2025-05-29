@@ -18,10 +18,4 @@ spec:
                 name: {{ include "wellsfargo.fullname" . }}
                 port:
                   number: 8080
-          - path: /identityiq
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ include "wellsfargo.fullname" . }}
-                port:
-                  number: 80
+          
