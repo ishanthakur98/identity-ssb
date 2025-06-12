@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "wellsfargo.fullname" . }}
+spec:
+  serviceName: {{ include "wellsfargo.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  selector:
+    matchLabels:
+      app: {{- include "wellsfargo.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{- include "wellsfargo.selectorLabels" . | nindent 8 }}
+      annotations:
+        # Ensure pods use host network to maintain same network behavior as Deployment
+        # This helps maintain connectivity to external resources like EC2 MySQL
+        "kubernetes.io/vpc-shared": "true"
+    spec:
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CATALINA_OPTS
+              value: "-Diiq.hostname=$(POD_NAME)"
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
