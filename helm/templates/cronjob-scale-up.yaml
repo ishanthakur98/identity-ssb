@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "wellsfargo.fullname" . }}-ui-scale-up
+spec:
+  schedule: "20 16 * * *"  # 14:30 PM daily
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ include "wellsfargo.fullname" . }}-scaler
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl patch hpa {{ include "wellsfargo.fullname" . }}-ui-hpa -p '{"spec":{"minReplicas":{{ .Values.hpa.ui.businessHours.minReplicas | default 3 }},"maxReplicas":{{ .Values.hpa.ui.businessHours.maxReplicas | default 15 }}}}'
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "wellsfargo-task.fullname" . }}-task-scale-up
+spec:
+  schedule: "20 16 * * *"  # 14:30 PM daily
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ include "wellsfargo.fullname" . }}-scaler
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl patch hpa {{ include "wellsfargo-task.fullname" . }}-task-hpa -p '{"spec":{"minReplicas":{{ .Values.hpa.task.businessHours.minReplicas | default 3 }},"maxReplicas":{{ .Values.hpa.task.businessHours.maxReplicas | default 10 }}}}'
+          restartPolicy: OnFailure

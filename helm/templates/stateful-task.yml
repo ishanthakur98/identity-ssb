@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "wellsfargo.fullname" . }}
+  name: {{ include "wellsfargo-task.fullname" . }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-weight": "1"
 spec:
-  serviceName: {{ include "wellsfargo.fullname" . }}
+  serviceName: {{ include "wellsfargo-task.fullname" . }}
   replicas: {{ .Values.replicaCount }}
   podManagementPolicy: OrderedReady
   updateStrategy:
@@ -16,12 +16,12 @@ spec:
   selector:
     matchLabels:
       {{- include "wellsfargo.selectorLabels" . | nindent 6 }}
-      component: ui
+      component: task
   template:
     metadata:
       labels:
         {{- include "wellsfargo.selectorLabels" . | nindent 8 }}
-        component: ui
+        component: task
       annotations:
         # Ensure pods use host network to maintain same network behavior as Deployment
         # This helps maintain connectivity to external resources like EC2 MySQL
@@ -38,13 +38,12 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            # ...existing code...
             - name: JAVA_OPTS
-              value: "-Diiq.hostname=$(POD_NAME) -Diiq.uinode=true"
+              value: "-Diiq.hostname=$(POD_NAME) -Diiq.tasknode=true"
             - name: SQL_DEPLOYMENT
               value: "no"
             - name: FIRST_DEPLOYMENT
-              value: 'no'
+              value: "no"
           ports:
             - containerPort: 8080
               name: http

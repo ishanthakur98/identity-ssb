@@ -18,4 +18,3 @@ spec:
                 name: {{ include "wellsfargo.fullname" . }}
                 port:
                   number: 8080
-          

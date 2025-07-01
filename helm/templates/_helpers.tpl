@@ -3,8 +3,16 @@
 wellsfargo
 {{- end -}}
 
+{{- define "wellsfargo-task.name" -}}
+wellsfargo-task
+{{- end -}}
+
 {{- define "wellsfargo.fullname" -}}
 {{ .Release.Name }}-wellsfargo
+{{- end -}}
+
+{{- define "wellsfargo-task.fullname" -}}
+{{ .Release.Name }}-wellsfargo-task
 {{- end -}}
 
 {{- define "wellsfargo.labels" -}}
