@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: {{ include "wellsfargo.fullname" . }}-ui-scale-up
 spec:
-  schedule: "20 16 * * *"  # 14:30 PM daily
+  schedule: "50 11 * * *"  # 14:30 PM daily
   jobTemplate:
     spec:
       template:
@@ -24,7 +24,7 @@ kind: CronJob
 metadata:
   name: {{ include "wellsfargo-task.fullname" . }}-task-scale-up
 spec:
-  schedule: "20 16 * * *"  # 14:30 PM daily
+  schedule: "50 11 * * *"  # 14:30 PM daily
   jobTemplate:
     spec:
       template:
