@@ -2,17 +2,14 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ include "wellsfargo.fullname" . }}
-  annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-weight": "0"
 spec:
   serviceName: {{ include "wellsfargo.fullname" . }}
   replicas: {{ .Values.replicaCount }}
-  podManagementPolicy: OrderedReady
+  podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      partition: 0
+      partition: 2
   selector:
     matchLabels:
       {{- include "wellsfargo.selectorLabels" . | nindent 6 }}
@@ -33,18 +30,24 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/entrypoint-app.sh"]
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            # ...existing code...
             - name: JAVA_OPTS
               value: "-Diiq.hostname=$(POD_NAME) -Diiq.uinode=true"
-            - name: SQL_DEPLOYMENT
-              value: "no"
-            - name: FIRST_DEPLOYMENT
-              value: 'no'
+            - name: DB_HOST
+              value: "{{ .Values.initContainer.env.DB_HOST }}"
+            - name: DB_PORT
+              value: "{{ .Values.initContainer.env.DB_PORT }}"
+            - name: DB_USER
+              value: "{{ .Values.initContainer.env.DB_USER }}"
+            - name: DB_PASS
+              value: "{{ .Values.initContainer.env.DB_PASS }}"
+            - name: DB_NAME
+              value: "{{ .Values.initContainer.env.DB_NAME }}"
           ports:
             - containerPort: 8080
               name: http

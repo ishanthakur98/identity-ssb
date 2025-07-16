@@ -5,7 +5,7 @@ metadata:
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "-1"
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   template:
     spec:
@@ -15,9 +15,9 @@ spec:
         image: {{ .Values.initContainer.image }}
         env:
           - name: SQL_DEPLOYMENT
-            value: "yes"
+            value: "{{ .Values.initContainer.env.SQL_DEPLOYMENT }}"
           - name: FIRST_DEPLOYMENT
-            value: "yes"
+            value: "{{ .Values.initContainer.env.FIRST_DEPLOYMENT }}"
           - name: DB_HOST
             value: "{{ .Values.initContainer.env.DB_HOST }}"
           - name: DB_PORT
@@ -28,17 +28,4 @@ spec:
             value: "{{ .Values.initContainer.env.DB_PASS }}"
           - name: DB_NAME
             value: "{{ .Values.initContainer.env.DB_NAME }}"
-        command:
-          - /bin/bash
-          - -c
-          - |
-            echo "Starting database initialization job..."
-            echo "Environment variables:"
-            echo "SQL_DEPLOYMENT: $SQL_DEPLOYMENT"
-            echo "FIRST_DEPLOYMENT: $FIRST_DEPLOYMENT"
-            echo "DB_HOST: $DB_HOST"
-            echo "DB_PORT: $DB_PORT"
-            echo "DB_NAME: $DB_NAME"
-            echo "Starting entrypoint script..."
-            /entrypoint.sh
-            echo "Database initialization job completed successfully"
+        command: ["/entrypoint-db.sh"]

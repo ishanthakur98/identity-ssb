@@ -1,5 +1,5 @@
-replicaCount: 2
-replicaCount-task: 3
+replicaCount: 4
+replicaCount-task: 4
 
 image:
   repository: ishanthakur1998/identity
@@ -61,8 +61,8 @@ affinity: {}
 initContainer:
   image: "ishanthakur1998/identity:localv4"
   env:
-    SQL_DEPLOYMENT: "true"
-    FIRST_DEPLOYMENT: "true"
+    SQL_DEPLOYMENT: "yes"     # Harness variable: yes/no
+    FIRST_DEPLOYMENT: "yes"   # Harness variable: yes for initial, no for updates
     DB_HOST: "host.docker.internal"
     DB_PORT: "3310"
     DB_USER: "root"

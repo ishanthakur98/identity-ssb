@@ -2,17 +2,12 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ include "wellsfargo-task.fullname" . }}
-  annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-weight": "1"
 spec:
   serviceName: {{ include "wellsfargo-task.fullname" . }}
   replicas: {{ .Values.replicaCount }}
-  podManagementPolicy: OrderedReady
+  podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
-    rollingUpdate:
-      partition: 0
   selector:
     matchLabels:
       {{- include "wellsfargo.selectorLabels" . | nindent 6 }}

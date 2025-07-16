@@ -15,7 +15,7 @@ RUN yum install -y wget && \
     yum clean all
 
 ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk
-ENV TOMCAT_VERSION=9.0.105
+ENV TOMCAT_VERSION=9.0.97
 
 COPY identityiq/WEB-INF/database/create_identityiq_tables-8.3.mysql /scripts/create_identityiq_tables-8.3.mysql
 
@@ -23,7 +23,8 @@ COPY identityiq/WEB-INF/database/create_identityiq_tables-8.3.mysql /scripts/cre
 RUN sed -i 's/mysql_native_password/caching_sha2_password/g' /scripts/create_identityiq_tables-8.3.mysql
 
 # Download and install Tomcat 9
-RUN wget https://downloads.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+RUN wget https://downloads.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz || \
+    wget https://archive.apache.org/dist/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
     tar -xzf apache-tomcat-${TOMCAT_VERSION}.tar.gz -C /opt && \
     mv /opt/apache-tomcat-${TOMCAT_VERSION} /opt/tomcat && \
     rm apache-tomcat-${TOMCAT_VERSION}.tar.gz
@@ -31,9 +32,10 @@ RUN wget https://downloads.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apa
 # Copy the identityiq directory contents into Tomcat
 COPY identityiq/ /opt/tomcat/webapps/identityiq/
 
-# Copy entrypoint script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Copy entrypoint scripts
+COPY entrypoint-db.sh /entrypoint-db.sh
+COPY entrypoint-app.sh /entrypoint-app.sh
+RUN chmod +x /entrypoint-db.sh /entrypoint-app.sh
 
 # Set permissions for OpenShift compatibility
 RUN chmod -R g+rwX /opt/tomcat && \
@@ -43,4 +45,4 @@ EXPOSE 8080
 
 USER 1001
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint-app.sh"]
