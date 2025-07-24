@@ -1,0 +1,47 @@
+# Option 1: Official Tomcat (Debian-based)
+# FROM tomcat:9.0.97-jdk11-openjdk
+
+# Option 2: Red Hat UBI with Tomcat (Enterprise)
+FROM registry.redhat.io/ubi8/openjdk-11:latest
+
+# Switch to root to install packages
+USER root
+
+# Install Tomcat and MySQL client
+ENV TOMCAT_VERSION=9.0.97
+RUN yum install -y wget && \
+    wget https://downloads.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    tar -xzf apache-tomcat-${TOMCAT_VERSION}.tar.gz -C /opt && \
+    mv /opt/apache-tomcat-${TOMCAT_VERSION} /usr/local/tomcat && \
+    rm apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    yum clean all
+
+# Install MySQL client
+RUN yum install -y wget && \
+    wget https://repo.mysql.com/mysql80-community-release-el8-1.noarch.rpm && \
+    yum install -y --nogpgcheck mysql80-community-release-el8-1.noarch.rpm && \
+    sed -i 's/gpgcheck=1/gpgcheck=0/' /etc/yum.repos.d/mysql-community*.repo && \
+    yum install -y mysql-community-client && \
+    yum clean all
+
+# Oracle Client Installation (commented)
+# Note: Uncomment and modify as needed for Oracle support
+#
+# # Install Oracle Instant Client dependencies
+# RUN apt-get update && \
+#     apt-get install -y libaio1 alien && \
+#     apt-get clean
+# 
+# # Download and install Oracle Instant Client
+# COPY oracle-instantclient*.rpm /tmp/
+# RUN alien -i /tmp/oracle-instantclient*.rpm && \
+#     rm -f /tmp/oracle-instantclient*.rpm && \
+#     echo /usr/lib/oracle/*/client64/lib > /etc/ld.so.conf.d/oracle-instantclient.conf && \
+#     ldconfig
+# 
+# # Set Oracle environment variables
+# ENV ORACLE_HOME=/usr/lib/oracle/*/client64
+# ENV LD_LIBRARY_PATH=$ORACLE_HOME/lib
+# ENV PATH=$PATH:$ORACLE_HOME/bin
+
+# Base image ready - application-specific setup in main Dockerfile

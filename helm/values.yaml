@@ -2,9 +2,9 @@ replicaCount: 4
 replicaCount-task: 4
 
 image:
-  repository: ishanthakur1998/identity
+  repository: ishanthakur1998/identity-iq
   pullPolicy: IfNotPresent
-  tag: localv4
+  tag: latest
 
 imagePullSecrets:
   - name: regcred
@@ -59,10 +59,10 @@ tolerations: []
 affinity: {}
 
 initContainer:
-  image: "ishanthakur1998/identity:localv4"
+  image: "ishanthakur1998/identity-iq:latest"
   env:
     SQL_DEPLOYMENT: "yes"     # Harness variable: yes/no
-    FIRST_DEPLOYMENT: "yes"   # Harness variable: yes for initial, no for updates
+    FIRST_DEPLOYMENT: "no"   # Harness variable: yes for initial, no for updates
     DB_HOST: "host.docker.internal"
     DB_PORT: "3310"
     DB_USER: "root"

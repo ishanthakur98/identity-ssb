@@ -2,12 +2,12 @@
 set -e
 
 echo "Starting database operations..."
-echo "SQL_DEPLOYMENT: $SQL_DEPLOYMENT"
-echo "FIRST_DEPLOYMENT: $FIRST_DEPLOYMENT"
+echo "DELTA_DB_DEPLOYMENT: $DELTA_DB_DEPLOYMENT"
+echo "INITIAL_DEPLOYMENT: $INITIAL_DEPLOYMENT"
 
 # Exit if no SQL deployment needed
-if [[ "$SQL_DEPLOYMENT" != "yes" ]]; then
-    echo "SQL_DEPLOYMENT is not 'yes', skipping database operations"
+if [[ "$DELTA_DB_DEPLOYMENT" != "yes" ]]; then
+    echo "DELTA_DB_DEPLOYMENT is not 'yes', skipping database operations"
     exit 0
 fi
 
@@ -24,20 +24,24 @@ done
 echo "Waiting for database to be ready..."
 until mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -e "SELECT 1" > /dev/null 2>&1; do
     echo "Database not ready, waiting..."
-    sleep 5
+    sleep $DB_WAIT_TIME
 done
 
-if [[ "$FIRST_DEPLOYMENT" == "yes" ]]; then
-    echo "Running initial database schema creation..."
-    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /scripts/create_identityiq_tables-8.3.mysql
+if [[ "$INITIAL_DEPLOYMENT" == "yes" ]]; then
     
     echo "Running IIQ console import for initial setup..."
     cd /opt/tomcat/webapps/identityiq/WEB-INF/bin
+    ./iiq schema
+    sed -i 's/mysql_native_password/caching_sha2_password/g' /opt/tomcat/webapps/identityiq/WEB-INF/create_identityiq_tables-8.3.mysql
+    
+    echo "Running initial database schema creation..."
+    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /opt/tomcat/webapps/identityiq/WEB-INF/create_identityiq_tables-8.3.mysql
+    
     ./iiq console <<EOF
-import init.xml
-exit
+    import init.xml
+    exit
 EOF
-else
+elif [[ "$DELTA_DB_DEPLOYMENT" == "yes" ]]; then
     echo "Running custom configuration import..."
     cd /opt/tomcat/webapps/identityiq/WEB-INF/bin
     ./iiq console <<EOF
@@ -47,3 +51,4 @@ EOF
 fi
 
 echo "Database operations completed successfully"
+exit 0  # Explicitly exit after DB operations

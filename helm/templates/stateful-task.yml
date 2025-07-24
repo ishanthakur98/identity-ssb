@@ -17,10 +17,6 @@ spec:
       labels:
         {{- include "wellsfargo.selectorLabels" . | nindent 8 }}
         component: task
-      annotations:
-        # Ensure pods use host network to maintain same network behavior as Deployment
-        # This helps maintain connectivity to external resources like EC2 MySQL
-        "kubernetes.io/vpc-shared": "true"
     spec:
       imagePullSecrets:
         {{- toYaml .Values.imagePullSecrets | nindent 8 }}
@@ -39,6 +35,8 @@ spec:
               value: "no"
             - name: FIRST_DEPLOYMENT
               value: "no"
+            - name: DB_WAIT_TIME
+              value: "5"
           ports:
             - containerPort: 8080
               name: http
@@ -53,15 +51,3 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}

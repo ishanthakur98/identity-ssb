@@ -19,10 +19,6 @@ spec:
       labels:
         {{- include "wellsfargo.selectorLabels" . | nindent 8 }}
         component: ui
-      annotations:
-        # Ensure pods use host network to maintain same network behavior as Deployment
-        # This helps maintain connectivity to external resources like EC2 MySQL
-        "kubernetes.io/vpc-shared": "true"
     spec:
       imagePullSecrets:
         {{- toYaml .Values.imagePullSecrets | nindent 8 }}
@@ -30,7 +26,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/entrypoint-app.sh"]
+          command: ["/scripts/app.sh"]  # Explicitly use app script
           env:
             - name: POD_NAME
               valueFrom:
@@ -48,6 +44,8 @@ spec:
               value: "{{ .Values.initContainer.env.DB_PASS }}"
             - name: DB_NAME
               value: "{{ .Values.initContainer.env.DB_NAME }}"
+            - name: DB_WAIT_TIME
+              value: "5"
           ports:
             - containerPort: 8080
               name: http
@@ -62,15 +60,3 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
