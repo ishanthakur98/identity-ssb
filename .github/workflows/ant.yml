@@ -27,5 +27,5 @@ jobs:
             cat servers.properties
       working-directory: src
     - name: Build with Ant
-      run: ant -noinput -buildfile build.xml
+      run: ant -noinput -buildfile build.xml -Dhostname=$(hostname)
       working-directory: src
