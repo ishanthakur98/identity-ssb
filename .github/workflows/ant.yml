@@ -48,5 +48,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build docker image
-      run: ./build-images.sh
+      run: |
+          chmod +x ./build-images.sh
+          ./build-images.sh
       working-directory: docker
