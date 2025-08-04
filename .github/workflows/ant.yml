@@ -65,3 +65,23 @@ jobs:
           chmod +x ./build-images.sh
           ./build-images.sh
       working-directory: docker
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.29.0'
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: 'v3.13.3'
+
+    - name: Update kubeconfig for EKS
+      run: |
+        aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster
+    - name: Deploy Helm chart to EKS
+      run: |
+          helm upgrade --install my-release ./helm-chart-directory \
+            --namespace my-namespace \
+            --set image.repository=${{ steps.login-ecr.outputs.registry }}/my-ecr-repo \
+            --set image.tag=${{ github.sha }}
+    
