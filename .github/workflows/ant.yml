@@ -26,6 +26,16 @@ jobs:
             sed -i "s/USGURISTHAKUR88/$(hostname)/g" servers.properties
             cat servers.properties
       working-directory: src
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1   # Change to your region
+
+    - name: Download ZIP from S3
+      run: aws s3 cp s3://identityzip/identityiq-8.3.zip /
+      working-directory: ga
     - name: Build with Ant
       run: ant -noinput -buildfile build.xml -Dhostname=$(hostname)
       working-directory: src
