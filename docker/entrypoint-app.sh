@@ -26,8 +26,8 @@ until mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -e "SELECT 1"
     sleep $DB_WAIT_TIME
 done
 
-# Set Java heap size if not already set
-JAVA_OPTS=${JAVA_OPTS:-"-Xms512m -Xmx1024m"}
+# Set Java heap size if not already set (optimized for 32GB pod)
+JAVA_OPTS=${JAVA_OPTS:-"-Xms24g -Xmx24g"}
 
 # LDAP Specific customization - Environment Variables
 export JAVA_OPTS="$JAVA_OPTS -Dcom.sun.jndi.ldap.connect.pool.timeout=300000"

@@ -2,12 +2,12 @@
 set -e
 
 echo "Starting database operations..."
-echo "DELTA_DB_DEPLOYMENT: $DELTA_DB_DEPLOYMENT"
+echo "DB_DEPLOYMENT: $DB_DEPLOYMENT"
 echo "INITIAL_DEPLOYMENT: $INITIAL_DEPLOYMENT"
 
 # Exit if no SQL deployment needed
-if [[ "$DELTA_DB_DEPLOYMENT" != "yes" ]]; then
-    echo "DELTA_DB_DEPLOYMENT is not 'yes', skipping database operations"
+if [[ "$DB_DEPLOYMENT" != "yes" ]]; then
+    echo "DB_DEPLOYMENT is not 'yes', skipping database operations"
     exit 0
 fi
 
@@ -41,7 +41,7 @@ if [[ "$INITIAL_DEPLOYMENT" == "yes" ]]; then
     import init.xml
     exit
 EOF
-elif [[ "$DELTA_DB_DEPLOYMENT" == "yes" ]]; then
+elif [[ "$DB_DEPLOYMENT" == "yes" ]]; then
     echo "Running custom configuration import..."
     cd /opt/tomcat/webapps/identityiq/WEB-INF/bin
     ./iiq console <<EOF
