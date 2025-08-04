@@ -4,10 +4,23 @@
 name: Java CI
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      APP_DEPLOYMENT:
+        description: 'Is it app deployment'
+        required: true
+        default: false
+        type: boolean
+      XML_DEPLOYMENT:
+        description: 'Is it xml deployment'
+        required: true
+        default: false
+        type: boolean
+      DB_DEPLOYMENT:
+        description: 'Is it xml deployment'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   build:
