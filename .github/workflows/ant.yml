@@ -21,6 +21,10 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+    - name: Replace hostname
+      run: |
+            sed -i "s/USGURISTHAKUR88/$(hostname)/g" src/servers.properties
+      working-directory: src
     - name: Build with Ant
       run: ant -noinput -buildfile build.xml
       working-directory: src
