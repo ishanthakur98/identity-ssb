@@ -3,7 +3,7 @@ set -e
 
 # Build base image
 echo "Building base image..."
-docker build -t ishanthakur1998/iiq-base:actions -f Dockerfile.base .
+docker build -t ishanthakur1998/iiq-base:latest -f Dockerfile.base .
 
 # Build application image
 echo "Building application image..."
