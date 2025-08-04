@@ -34,8 +34,7 @@ jobs:
         aws-region: us-east-1   # Change to your region
 
     - name: Download ZIP from S3
-      run: aws s3 cp s3://identityzip/identityiq-8.3.zip /
-      working-directory: ga
+      run: aws s3 cp s3://identityzip/identityiq-8.3.zip ./identity-ssb/src/base/ga/identityiq-8.3.zip
     - name: Build with Ant
       run: ant -noinput -buildfile build.xml -Dhostname=$(hostname)
       working-directory: src
