@@ -1,0 +1,54 @@
+# This workflow will build a Java project with Ant
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-ant
+
+name: Java CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    - name: Replace hostname
+      run: |
+            sed -i "s/USGURISTHAKUR88/$(hostname)/g" servers.properties
+            cat servers.properties
+      working-directory: src
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1   # Change to your region
+
+    - name: Download ZIP from S3
+      run: aws s3 cp s3://identityzip/identityiq-8.3.zip ./src/base/ga/identityiq-8.3.zip
+    - name: Build with Ant
+      run: ant -noinput -buildfile build.xml -Dhostname=$(hostname)
+      working-directory: src
+    - name: Prepare Docker context
+      run: |
+        mkdir -p docker/identityiq
+        cp -r src/build/extract/* docker/identityiq/
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build docker image
+      run: |
+          chmod +x ./build-images.sh
+          ./build-images.sh
+      working-directory: docker
