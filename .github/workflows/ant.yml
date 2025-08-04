@@ -38,3 +38,15 @@ jobs:
     - name: Build with Ant
       run: ant -noinput -buildfile build.xml -Dhostname=$(hostname)
       working-directory: src
+    - name: Prepare Docker context
+      run: |
+        mkdir -p docker/identityiq
+        cp -r src/build/extract/* docker/identityiq/
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build docker image
+      run: ./build-images.sh
+      working-directory: docker
