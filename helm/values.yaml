@@ -90,7 +90,7 @@ initContainer:
   image: "ishanthakur1998/identity-iq:latest"
   env:
     DELTA_DB_DEPLOYMENT: "yes"     # Harness variable: yes/no
-    INITIAL_DEPLOYMENT: "no"   # Harness variable: yes for initial, no for updates
+    INITIAL_DEPLOYMENT: "yes"   # Harness variable: yes for initial, no for updates
     FULL_DEPLOYMENT: "no"   # Harness variable: yes for initial, no for updates"
     DB_HOST: "host.docker.internal"
     DB_PORT: "3310"
