@@ -84,7 +84,7 @@ jobs:
 
     - name: Update kubeconfig for EKS
       run: |
-        aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster
+        aws eks update-kubeconfig --region us-east-1 --name demo-eks-cluster
         
     - name: Deploy Helm chart to EKS
       run: |
