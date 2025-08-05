@@ -31,6 +31,8 @@ sed -i "s/DUMMY_DB_USERNAME/${DB_USER}/g" /opt/tomcat/webapps/identityiq/WEB-INF
 # Replace DB_USERNAME
 sed -i "s/DUMMY_DB_PORT/${DB_PORT}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
 
+cat /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+
 # Wait for database to be ready
 echo "Waiting for database to be ready..."
 until mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -e "SELECT 1" > /dev/null 2>&1; do
