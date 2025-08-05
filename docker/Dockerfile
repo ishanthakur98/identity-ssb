@@ -14,6 +14,7 @@ RUN chmod +x /scripts/app.sh /scripts/db.sh
 # Create identityiq user and set permissions for OpenShift compatibility
 RUN useradd -u 1001 identityiq && \
     chmod -R g+rwX /opt/tomcat && \
+    chmod +x /opt/tomcat/webapps/identityiq/WEB-INF/bin/* && \
     chown -R identityiq:0 /opt/tomcat /scripts
 
 EXPOSE 8080

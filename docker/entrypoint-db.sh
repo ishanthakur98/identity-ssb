@@ -5,11 +5,6 @@ echo "Starting database operations..."
 echo "DB_DEPLOYMENT: $DB_DEPLOYMENT"
 echo "INITIAL_DEPLOYMENT: $INITIAL_DEPLOYMENT"
 
-# Exit if no SQL deployment needed
-if [[ "$DB_DEPLOYMENT" != "yes" ]]; then
-    echo "DB_DEPLOYMENT is not 'yes', skipping database operations"
-    exit 0
-fi
 
 # Validate required environment variables
 required_vars=("DB_HOST" "DB_PORT" "DB_USER" "DB_PASS" "DB_NAME")
@@ -31,6 +26,8 @@ if [[ "$INITIAL_DEPLOYMENT" == "yes" ]]; then
     
     echo "Running IIQ console import for initial setup..."
     cd /opt/tomcat/webapps/identityiq/WEB-INF/bin
+    chmod +x ./iiq
+
     ./iiq schema
     sed -i 's/mysql_native_password/caching_sha2_password/g' /opt/tomcat/webapps/identityiq/WEB-INF/create_identityiq_tables-8.3.mysql
     
@@ -42,6 +39,8 @@ if [[ "$INITIAL_DEPLOYMENT" == "yes" ]]; then
     exit
 EOF
 elif [[ "$DB_DEPLOYMENT" == "yes" ]]; then
+    chmod +x ./iiq
+
     echo "Running custom configuration import..."
     cd /opt/tomcat/webapps/identityiq/WEB-INF/bin
     ./iiq console <<EOF
