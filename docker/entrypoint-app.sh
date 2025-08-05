@@ -20,16 +20,16 @@ if [ ! -d "$FULL_TEXT_INDEX_PATH" ]; then
 fi
 
 # Replace DB_PASS
-sed -i "s/DUMMY_DB_PASSWORD/${DB_PASS}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+sed -i "s/DUMMY_DB_PASSWORD/$DB_PASS/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
 
 # Replace DB_URL
-sed -i "s/DUMMY_DB_URL/${DB_URL}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+sed -i "s/DUMMY_DB_URL/$DB_URL/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
 
 # Replace DB_USERNAME
-sed -i "s/DUMMY_DB_USERNAME/${DB_USER}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+sed -i "s/DUMMY_DB_USERNAME/$DB_USER/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
 
 # Replace DB_USERNAME
-sed -i "s/DUMMY_DB_PORT/${DB_PORT}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+sed -i "s/DUMMY_DB_PORT/$DB_PORT/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
 
 cat /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
 
