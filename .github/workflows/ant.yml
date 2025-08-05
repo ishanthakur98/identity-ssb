@@ -90,6 +90,6 @@ jobs:
       run: |
           helm upgrade --install wellsfargo ./helm/ --set image.repository=ishanthakur1998/identity-iq \
            --set image.tag=actions --set initContainer.env.DB_HOST=10.0.0.10 \
-           --set initContainer.env.DB_USER=root --set initContainer.env.DB_PASS \
+           --set initContainer.env.DB_USER=root --set initContainer.env.DB_PASS=root \
           --set initContainer.env.DB_PORT=3306 --set initContainer.image=ishanthakur1998/identity-iq:actions
     
