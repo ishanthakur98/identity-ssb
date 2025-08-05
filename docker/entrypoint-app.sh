@@ -28,10 +28,12 @@ sed -i "s/DUMMY_DB_URL/$DB_URL/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes
 # Replace DB_USERNAME
 sed -i "s/DUMMY_DB_USERNAME/$DB_USER/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
 
-# Replace DB_USERNAME
+# Replace DB_PORT
 sed -i "s/DUMMY_DB_PORT/$DB_PORT/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
 
+echo "priniting file logs started"
 cat /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+echo "priniting file logs ended"
 
 # Wait for database to be ready
 echo "Waiting for database to be ready..."
