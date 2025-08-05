@@ -91,6 +91,5 @@ jobs:
           helm upgrade --install wellsfargo ./helm/ --set image.repository=ishanthakur1998/identity-iq \
            --set image.tag=actionsv2 --set initContainer.env.DB_HOST=10.0.0.10 \
            --set initContainer.env.DB_USER=root --set initContainer.env.DB_PASS=root \
-          --set initContainer.env.DB_PORT=3306 --set initContainer.image=ishanthakur1998/identity-iq:actionsv2 \
-          --set initContainer.env.INITIAL_DEPLOYMENT=yes
+          --set initContainer.env.DB_PORT=3306 --set initContainer.image=ishanthakur1998/identity-iq:actionsv2
     
