@@ -7,9 +7,9 @@ docker build -t ishanthakur1998/iiq-base:latest -f Dockerfile.base .
 
 # Build application image
 echo "Building application image..."
-docker build -t ishanthakur1998/identity-iq:actionsv2 -f Dockerfile .
+docker build -t ishanthakur1998/identity-iq:actionsv3 -f Dockerfile .
 
 # Push the image
-docker image push docker.io/ishanthakur1998/identity-iq:actionsv2
+docker image push docker.io/ishanthakur1998/identity-iq:actionsv3
 
 echo "Images built successfully"
