@@ -29,10 +29,10 @@ if [[ "$INITIAL_DEPLOYMENT" == "yes" ]]; then
     chmod +x ./iiq
 
     ./iiq schema
-    sed -i 's/mysql_native_password/caching_sha2_password/g' /opt/tomcat/webapps/identityiq/WEB-INF/create_identityiq_tables-8.3.mysql
+    sed -i 's/mysql_native_password/caching_sha2_password/g' /opt/tomcat/webapps/identityiq/WEB-INF/database/create_identityiq_tables-8.3.mysql
     
     echo "Running initial database schema creation..."
-    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /opt/tomcat/webapps/identityiq/WEB-INF/create_identityiq_tables-8.3.mysql
+    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /opt/tomcat/webapps/identityiq/WEB-INF/database/create_identityiq_tables-8.3.mysql
     
     ./iiq console <<EOF
     import init.xml
