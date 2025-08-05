@@ -15,10 +15,10 @@ spec:
       - name: db-init
         image: {{ .Values.initContainer.image }}
         env:
-          - name: SQL_DEPLOYMENT
-            value: {{ .Values.initContainer.env.SQL_DEPLOYMENT | quote }}
-          - name: FIRST_DEPLOYMENT
-            value: {{ .Values.initContainer.env.FIRST_DEPLOYMENT | quote }}
+          - name: DB_DEPLOYMENT
+            value: {{ .Values.initContainer.env.DB_DEPLOYMENT | quote }}
+          - name: INITIAL_DEPLOYMENT
+            value: {{ .Values.initContainer.env.INITIAL_DEPLOYMENT | quote }}
           - name: DB_HOST
             value: {{ .Values.initContainer.env.DB_HOST | quote }}
           - name: DB_PORT
@@ -32,15 +32,3 @@ spec:
           - name: DB_WAIT_TIME
             value: "5"
         command: ["/scripts/db.sh"]  # Use DB-only script that doesn't start Tomcat
-        volumeMounts:
-        - name: data-volume
-          mountPath: /data
-        - name: config-volume
-          mountPath: /config
-      volumes:
-      - name: data-volume
-        persistentVolumeClaim:
-          claimName: {{ include "wellsfargo.fullname" . }}-data-pvc
-      - name: config-volume
-        configMap:
-          name: {{ include "wellsfargo.fullname" . }}-config

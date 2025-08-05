@@ -19,6 +19,18 @@ if [ ! -d "$FULL_TEXT_INDEX_PATH" ]; then
     chmod 775 "$FULL_TEXT_INDEX_PATH"
 fi
 
+# Replace DB_PASS
+sed -i "s/DUMMY_DB_PASSWORD/${DB_PASS}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+
+# Replace DB_URL
+sed -i "s/DUMMY_DB_URL/${DB_URL}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+
+# Replace DB_USERNAME
+sed -i "s/DUMMY_DB_USERNAME/${DB_USER}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+
+# Replace DB_USERNAME
+sed -i "s/DUMMY_DB_PORT/${DB_PORT}/g" /opt/tomcat/webapps/identityiq/WEB-INF/classes/iiq.properties
+
 # Wait for database to be ready
 echo "Waiting for database to be ready..."
 until mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -e "SELECT 1" > /dev/null 2>&1; do

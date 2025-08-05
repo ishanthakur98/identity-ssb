@@ -33,7 +33,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: JAVA_OPTS
-              value: "-Diiq.hostname=$(POD_NAME) -Diiq.uinode=true"
+              value: "-Diiq.hostname=$(POD_NAME) -Diiq.uinode=true {{ .Values.ui.heap.min }} {{ .Values.ui.heap.max }}"
             - name: DB_HOST
               value: "{{ .Values.initContainer.env.DB_HOST }}"
             - name: DB_PORT
@@ -46,6 +46,10 @@ spec:
               value: "{{ .Values.initContainer.env.DB_NAME }}"
             - name: DB_WAIT_TIME
               value: "5"
+            - name: UPLOAD_FILE_PATH
+              value: "{{ .Values.ui.UPLOAD_FILE_PATH }}"
+            - name: FULL_TEXT_INDEX_PATH
+              value: "{{ .Values.ui.FULL_TEXT_INDEX_PATH }}"
           ports:
             - containerPort: 8080
               name: http
@@ -58,5 +62,42 @@ spec:
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
+          # volumeMounts:
+          #   - name: config-volume
+          #     mountPath: /opt/tomcat/identityiq/WEB-INF/classes/iiq.properties
+          #     subPath: iiq.properties
+          #   - name: config-volume
+          #     mountPath: /opt/tomcat/identityiq/WEB-INF/classes/log4j2.properties
+          #     subPath: log4j2.properties
+          #   - name: config-volume
+          #     mountPath: /opt/tomcat/identityiq/WEB-INF/classes/keystore
+          #     subPath: keystore/
+          #   - name: config-volume
+          #     mountPath: {{ .Values.task.UPLOAD_FILE_PATH }}
+          #     subPath: iiq-upload/
+          #   - name: config-volume
+          #     mountPath: {{ .Values.task.FULL_TEXT_INDEX_PATH }}
+          #     subPath: iiq-index/
+          #   - name: logs-volume
+          #     mountPath: /opt/tomcat/logs
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            requests:
+              cpu: {{ .Values.ui.resources.requests.cpu | default "100m" }}
+              memory: {{ .Values.ui.resources.requests.memory | default "256Mi" }}
+            limits:
+              cpu: {{ .Values.ui.resources.limits.cpu | default "500m" }}
+              memory: {{ .Values.ui.resources.limits.memory | default "512Mi" }}
+  #     volumes:
+  #       - name: config-volume
+  #         persistentVolumeClaim:
+  #           claimName: {{ include "wellsfargo.fullname" . }}-config-pvc
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: logs-volume
+  #   spec:
+  #     accessModes:
+  #       - ReadWriteOnce
+  #     storageClassName: {{ .Release.Name }}-iiq-logs-nfs
+  #     resources:
+  #       requests:
+  #         storage: {{ .Values.storage.size | default "5Gi" }}

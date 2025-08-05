@@ -4,7 +4,7 @@ metadata:
   name: {{ include "wellsfargo-task.fullname" . }}
 spec:
   serviceName: {{ include "wellsfargo-task.fullname" . }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ index .Values "replicaCount-task" }}
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
@@ -24,19 +24,33 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/scripts/app.sh"]  # Explicitly use app script
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
             - name: JAVA_OPTS
-              value: "-Diiq.hostname=$(POD_NAME) -Diiq.tasknode=true"
-            - name: SQL_DEPLOYMENT
-              value: "no"
-            - name: FIRST_DEPLOYMENT
-              value: "no"
+              value: "-Diiq.hostname=$(POD_NAME) -Diiq.tasknode=true {{ .Values.task.heap.min }} {{ .Values.task.heap.max }}"
             - name: DB_WAIT_TIME
-              value: "5"
+              value: "{{ .Values.initContainer.env.DB_WAIT_TIME }}"
+            - name: DB_HOST
+              value: "{{ .Values.initContainer.env.DB_HOST }}"
+            - name: DB_PORT
+              value: "{{ .Values.initContainer.env.DB_PORT }}"
+            - name: DB_USER
+              value: "{{ .Values.initContainer.env.DB_USER }}"
+            - name: DB_PASS
+              value: "{{ .Values.initContainer.env.DB_PASS }}"
+            - name: DB_NAME
+              value: "{{ .Values.initContainer.env.DB_NAME }}"
+            - name: UPLOAD_FILE_PATH
+              value: "{{ .Values.task.UPLOAD_FILE_PATH }}"
+            - name: FULL_TEXT_INDEX_PATH
+              value: "{{ .Values.task.FULL_TEXT_INDEX_PATH }}"
           ports:
             - containerPort: 8080
               name: http
@@ -49,5 +63,42 @@ spec:
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
+          # volumeMounts:
+          #   - name: config-volume
+          #     mountPath: /opt/tomcat/identityiq/WEB-INF/classes/iiq.properties
+          #     subPath: iiq.properties
+          #   - name: config-volume
+          #     mountPath: /opt/tomcat/identityiq/WEB-INF/classes/log4j2.properties
+          #     subPath: log4j2.properties
+          #   - name: config-volume
+          #     mountPath: /opt/tomcat/identityiq/WEB-INF/classes/keystore
+          #     subPath: keystore/
+          #   - name: config-volume
+          #     mountPath: {{ .Values.task.UPLOAD_FILE_PATH }}
+          #     subPath: iiq-upload/
+          #   - name: config-volume
+          #     mountPath: {{ .Values.task.FULL_TEXT_INDEX_PATH }}
+          #     subPath: iiq-index/
+          #   - name: logs-volume
+          #     mountPath: /opt/tomcat/logs
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            requests:
+              cpu: {{ .Values.task.resources.requests.cpu | default "100m" }}
+              memory: {{ .Values.task.resources.requests.memory | default "256Mi" }}
+            limits:
+              cpu: {{ .Values.task.resources.limits.cpu | default "500m" }}
+              memory: {{ .Values.task.resources.limits.memory | default "512Mi" }}
+  #     volumes:
+  #       - name: config-volume
+  #         persistentVolumeClaim:
+  #           claimName: {{ include "wellsfargo.fullname" . }}-config-pvc
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: logs-volume
+  #   spec:
+  #     accessModes:
+  #       - ReadWriteOnce
+  #     storageClassName: {{ .Release.Name }}-iiq-logs-nfs
+  #     resources:
+  #       requests:
+  #         storage: {{ .Values.storage.size | default "5Gi" }}

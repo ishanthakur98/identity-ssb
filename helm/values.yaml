@@ -1,25 +1,17 @@
-replicaCount: 4
-replicaCount-task: 4
+replicaCount: 1
+replicaCount-task: 1
 
 image:
   repository: ishanthakur1998/identity-iq
   pullPolicy: IfNotPresent
   tag: latest
 
-imagePullSecrets:
-  - name: regcred
+# imagePullSecrets:
+#   - name: regcred
 
 service:
   type: NodePort
   port: 8080
-
-db:
-  host: localhost:3309
-  user: root
-  password: root
-  name: identityiq
-
-sqlConfigMap: db-init-sql
 
 
 resources:
@@ -52,19 +44,57 @@ hpa:
       minReplicas: 2
       maxReplicas: 3
 
+task:
+  UPLOAD_FILE_PATH: "/opt/identityiq/upload"
+  FULL_TEXT_INDEX_PATH: "/opt/identityiq/index"
+  heap:
+    min: "-Xms512m"
+    max: "-Xmx512m"
+  resources:
+    requests:
+      cpu: "1"
+      memory: "1Gi"
+    limits:
+      cpu: "8"
+      memory: "1Gi"
+
+ui:
+  UPLOAD_FILE_PATH: "/opt/identityiq/upload"
+  FULL_TEXT_INDEX_PATH: "/opt/identityiq/index"
+  heap:
+    min: "-Xms1g"
+    max: "-Xmx1g"
+  resources:
+    requests:
+      cpu: "1"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
 
+storage:
+  nfsServer: "127.0.0.1"  # Docker Desktop host
+  config:
+    nfsPath: "/iiq-config"
+  logs:
+    nfsPath: "/iiq-logs"
+  size: "10Gi"
+
 initContainer:
   image: "ishanthakur1998/identity-iq:latest"
   env:
-    SQL_DEPLOYMENT: "yes"     # Harness variable: yes/no
-    FIRST_DEPLOYMENT: "no"   # Harness variable: yes for initial, no for updates
+    DELTA_DB_DEPLOYMENT: "yes"     # Harness variable: yes/no
+    INITIAL_DEPLOYMENT: "no"   # Harness variable: yes for initial, no for updates
+    FULL_DEPLOYMENT: "no"   # Harness variable: yes for initial, no for updates"
     DB_HOST: "host.docker.internal"
     DB_PORT: "3310"
     DB_USER: "root"
     DB_PASS: "root"
     DB_NAME: "identityiq"
+    DB_WAIT_TIME: "5"
